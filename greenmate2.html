@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+		<title>GREEN MATE</title>
+    <link rel="stylesheet" type="text/css" href="css/materialize.min.css"  media="screen,projection"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+    <script>
+			var add_guide_counter = 0;
+
+      $(document).ready(function(){
+				window.onbeforeunload = function() { return "You work will be lost."; };
+				$('.modal').modal();
+    		$('select').material_select();
+				$('.login_').click(function(){
+					var id_ = $('#id').val();
+					var pw_ = $('#password').val();
+					$('.loader').addClass('active');
+					login(id_,pw_);
+				})
+				
+				$('.left_nav li').click(function(){
+					if($(this).attr('id') == 'logout'){
+					}
+					else{
+						goto_pages();
+						removeall_active();
+						$(this).addClass('active');
+						var temp_id = $(this).attr('id');
+						$('.' + temp_id).addClass('active');
+					}
+				})
+				
+				$('tr.qa_').click(function(){
+					var getid = $(this).attr('id');
+					$('#memeber_id').val(getid);
+					goto_innerpage();
+					$('.page_qa').css('display','inherit');
+				})
+				
+				$('tr.guide_ td:not(:last-child)').click(function(){
+					goto_innerpage();
+					$('.page_guide').css('display','inherit');
+				})
+				
+				$('tr.plant_ td:not(:first-child)').click(function(){
+					goto_innerpage();
+					$('.page_plant').css('display','inherit');
+				})
+				$('tr.manager_').click(function(){
+					goto_innerpage();
+					$('.page_manager').css('display','inherit');
+				})
+				
+				$('#member_a').click(function(){
+					$('#member_a').css('display','none');
+					$('#member_a_area').css('display','inherit');
+				})
+				
+				$('#plant_all_checker').click(function(){
+					 $('.plant_ td input:checkbox').not(this).prop('checked', this.checked);
+				})
+      });
+
+			function removeall_active(){
+				$('.left_nav li').removeClass('active');
+				$('.pages').removeClass('active');
+			}
+			function goto_innerpage(){
+				$('.pages_wrapper').css('display','none');
+			}
+			function goto_pages(){
+				$('.pages_wrapper').css('display','inherit');
+				$('.inner_page').css('display','none');
+				add_guide_counter = 0;
+				$('.inner_page #add_guide').empty();
+				$('.inner_page #add_guide2').empty();
+				
+			}
+			function add_guide_content(){
+				var html_string = $('.guide_wrapper').html();
+				add_guide_counter++;
+				$('#guide_content_').attr('id','guide_content_'+add_guide_counter);
+				$('#add_guide').append(html_string);
+			}
+			function add_guide_content2(){
+				var html_string = $('.guide_wrapper').html();
+				$('#add_guide2').append(html_string);
+			}
+			function qr_print(){
+				goto_innerpage();
+				$('.page_qr').css('display','inherit');
+			}
+			function add_guide(){
+				goto_innerpage();
+				$('.page_guide_add').css('display','inherit');
+			}
+			function add_manager(){
+				goto_innerpage();
+				$('.page_manager_add').css('display','inherit');
+			}
+			function mypage_adjust(){
+				goto_innerpage();
+				$('.page_mypage_adjust').css('display','inherit');
+			}
+			function login(id_, pw_){
+				$.ajax({
+					type: "POST",  
+					url: 'https://greenmate-163904.appspot.com/login',    
+					data: {
+						id: id_,
+						password: pw_
+					}
+					}).success(function( data, textStatus, jqXHR ){
+						if(data.isSuccess == 1){
+							$('.login_page').addClass('active');
+							$('.loader').removeClass('active');
+							console.log(data);
+						}
+					});
+			}
+			function logout(){
+				$('.login_page').removeClass('active');
+				$('.loader').addClass('active');
+				$.ajax({
+					type: "GET",  
+					url: 'https://greenmate-163904.appspot.com/logout',    
+					data:{	}
+					}).success(function( data, textStatus, jqXHR ){
+						if(data.isSuccess == 1){
+							$('.loader').removeClass('active');
+							alert('로그아웃 되었습니다!')
+						}
+					});
+			}
+			function qa_1(){
+				$.ajax({
+					type: "GET",  
+					url: 'https://greenmate-163904.appspot.com/question/solved?page=1'
+					}).success(function( data, textStatus, jqXHR ){
+						console.log(data);
+					});
+			}
+    </script>
+  </head>
+  <body>
+  <div class="loader loader--style3" title="2">
+		<svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			 width="75px" height="75px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+		<path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
+			<animateTransform attributeType="xml"
+				attributeName="transform"
+				type="rotate"
+				from="0 25 25"
+				to="360 25 25"
+				dur="0.6s"
+				repeatCount="indefinite"/>
+			</path>
+		</svg>
+	</div>
+ 
+  <div class="login_page">
+		<div class="row">
+			<div class="offset-l4 col s12 m12 l4">
+				<div class="row">
+					<div class="col s12 center-align">
+						<img class="responsive-img" src="img/logo.png" alt="">
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="input-field col s12">
+						<input id="id" type="text" class="validate" value="heesu1220@nate.com">
+						<label for="id">ID</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12">
+						<input id="password" type="password" class="validate" value="hahaha">
+						<label for="password">PASSWORD</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col s12 center-align">
+						<a href="#" class="btn login_">LOGIN</a>
+					</div>
+				</div>
+			</div>
+		</div>
+  </div>
+		<div class="container_">
+			<ul class="left_nav">
+				<li id="page0" class="center-align"><img height="162px" src="img/logo.png"></li>
+				<li id="page1" class="active"> <i class="material-icons left">question_answer</i>질문게시판</li>
+				<li id="page2" class="">	<i class="material-icons left">class</i>가이드</li>
+				<li id="page3" class="">	<i class="material-icons left">settings_remote</i>식물관리</li>
+				<li id="page4" class="">	<i class="material-icons left">supervisor_account</i>회원관리</li>
+				<li id="page5" class="">	<i class="material-icons left">recent_actors</i>매니저관리</li>
+				<li id="page6" class="">	<i class="material-icons left">assignment_ind</i>마이페이지</li>
+				<li id="logout" onclick="logout()"><i class="material-icons left">lock_outline</i>로그아웃</li>
+			</ul>
+			<div class="pages_wrapper">
+				<div class="pages page0">
+					<img src="img/profile.jpg" alt="">
+				</div>
+				<div class="pages page1 active">
+					<div class="top_">
+						<div class="left"><h2>질문게시판</h2></div>
+						<div class="right"><input type="checkbox" id="seeqa"><label for="seeqa">전문가 답변이 없는 질문만 보기</label></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight ">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>작성자</th>
+									<th>제목</th>
+									<th>작성일</th>
+									<th>답변수</th>
+									<th>전문가 답변수</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="qa_" id="qa_5">
+									<td>5</td>
+									<td>회원 5</td>
+									<td>질문 제목5</td>
+									<td>2017.02.05</td>
+									<td>55</td>
+									<td>0</td>
+								</tr>
+								
+								<tr class="qa_" id="qa_4">
+									<td>4</td>
+									<td>회원 4</td>
+									<td>질문 제목4</td>
+									<td>2017.02.04</td>
+									<td>44</td>
+									<td>0</td>
+								</tr>
+								
+								<tr class="qa_" id="qa_3">
+									<td>3</td>
+									<td>회원 3</td>
+									<td>질문 제목3</td>
+									<td>2017.02.03</td>
+									<td>33</td>
+									<td>0</td>
+								</tr>
+								
+								<tr class="qa_" id="qa_2">
+									<td>2</td>
+									<td>회원 2</td>
+									<td>질문 제목2</td>
+									<td>2017.02.02</td>
+									<td>22</td>
+									<td>0</td>
+								</tr>
+								
+								<tr class="qa_" id="qa_1">
+									<td>1</td>
+									<td>회원 1</td>
+									<td>질문 제목1</td>
+									<td>2017.02.01</td>
+									<td>11</td>
+									<td>0</td>
+								</tr>
+							</tbody>
+						</table>
+					  <div class="row pagination_wrapper">
+							<div class="col offset-s4 offset-m4 offset-l4 s4 m4 l4  center-align">
+								<ul class="pagination">
+									<li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+									<li class="active"><a href="#!">1</a></li>
+									<li class="waves-effect"><a href="#!">2</a></li>
+									<li class="waves-effect"><a href="#!">3</a></li>
+									<li class="waves-effect"><a href="#!">4</a></li>
+									<li class="waves-effect"><a href="#!">5</a></li>
+									<li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+								</ul>
+							</div>
+							<div class="col s4 m4 l4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="회원명, 제목, 내용" id="qa_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page2">
+					<div class="top_">
+						<div class="left"><h2>가이드</h2></div>
+						<div class="right"><a href="#" class="btn" onclick="add_guide()">가이드 추가</a></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>게시자</th>
+									<th>내용</th>
+									<th>게시일</th>
+									<th>표시함</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="guide_" id="guide5">
+									<td>5</td>
+									<td>게시자 5</td>
+									<td>가이드 제목5</td>
+									<td>2017.02.05</td>
+									<td><input type="checkbox" checked="checked" disabled="disabled" id="guide5"><label for="guide5"></label></td>
+								</tr>
+								
+								<tr class="guide_" id="guide4">
+									<td>4</td>
+									<td>게시자 4</td>
+									<td>가이드 제목4</td>
+									<td>2017.02.04</td>
+									<td><input type="checkbox" disabled="disabled" id="guide4"><label for="guide4"></label></td>
+								</tr>
+								
+								<tr class="guide_" id="guide3">
+									<td>3</td>
+									<td>게시자 3</td>
+									<td>가이드 제목3</td>
+									<td>2017.02.03</td>
+									<td><input type="checkbox" checked="checked" disabled="disabled" id="guide3"><label for="guide3"></label></td>
+								</tr>
+								
+								<tr class="guide_" id="guide2">
+									<td>2</td>
+									<td>게시자 2</td>
+									<td>가이드 제목2</td>
+									<td>2017.02.02</td>
+									<td><input type="checkbox" checked="checked" disabled="disabled" id="guide2"><label for="guide2"></label></td>
+								</tr>
+								
+								<tr class="guide_" id="guide1">
+									<td>1</td>
+									<td>게시자 1</td>
+									<td>가이드 제목1</td>
+									<td>2017.02.01</td>
+									<td><input type="checkbox" disabled="disabled" id="guide1"><label for="guide1"></label></td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="row pagination_wrapper center-align">
+							<ul class="pagination">
+								<li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+								<li class="active"><a href="#!">1</a></li>
+								<li class="waves-effect"><a href="#!">2</a></li>
+								<li class="waves-effect"><a href="#!">3</a></li>
+								<li class="waves-effect"><a href="#!">4</a></li>
+								<li class="waves-effect"><a href="#!">5</a></li>
+								<li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="pages page3">
+					<div class="top_">
+						<div class="left"><h2>식물 관리</h2></div>
+						<div class="right"><input type="checkbox" id="seeplant"><label for="seeplant">내가 관리하는<br>식물만 보기</label></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th><input type="checkbox" id="plant_all_checker"><label for="plant_all_checker"></label></th>
+									<th>번호</th>
+									<th>지점</th>
+									<th>관리자</th>
+									<th>구매자</th>
+									<th>식물명</th>
+									<th>등록일</th>
+									<th>갱신일</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="plant_" id="plant5">
+									<td><input type="checkbox" id="plant_check5"><label for="plant_check5"></label></td>
+									<td>5</td>
+									<td>지점E</td>
+									<td>관리5</td>
+									<td>구매자5</td>
+									<td>식물명5</td>
+									<td>17.02.05</td>
+									<td>17.02.05</td>
+								</tr>
+								
+								<tr class="plant_" id="plant4">
+									<td><input type="checkbox" id="plant_check4"><label for="plant_check4"></label></td>
+									<td>4</td>
+									<td>지점D</td>
+									<td>관리4</td>
+									<td>구매자4</td>
+									<td>식물명5</td>
+									<td>17.02.04</td>
+									<td>17.02.04</td>
+								</tr>
+								
+								<tr class="plant_" id="plant3">
+									<td><input type="checkbox" id="plant_check3"><label for="plant_check3"></label></td>
+									<td>3</td>
+									<td>지점C</td>
+									<td>관리3</td>
+									<td>구매자3</td>
+									<td>식물명3</td>
+									<td>17.02.03</td>
+									<td>17.02.03</td>
+								</tr>
+								
+								<tr class="plant_" id="plant2">
+									<td><input type="checkbox" id="plant_check2"><label for="plant_check2"></label></td>
+									<td>2</td>
+									<td>지점B</td>
+									<td>관리2</td>
+									<td>구매자2</td>
+									<td>식물명2</td>
+									<td>17.02.02</td>
+									<td>17.02.02</td>
+								</tr>
+								
+								<tr class="plant_" id="plant1">
+									<td><input type="checkbox" id="plant_check1"><label for="plant_check1"></label></td>
+									<td>1</td>
+									<td>지점A</td>
+									<td>관리1</td>
+									<td>구매자1</td>
+									<td>식물명1</td>
+									<td>17.02.01</td>
+									<td>17.02.01</td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="row pagination_wrapper">
+							<div class="col s4">
+								<a href="#!" class="btn" onclick="qr_print()">QR 프린트</a>
+							</div>
+							<div class="col s4 center-align">
+								<ul class="pagination">
+									<li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+									<li class="active"><a href="#!">1</a></li>
+									<li class="waves-effect"><a href="#!">2</a></li>
+									<li class="waves-effect"><a href="#!">3</a></li>
+									<li class="waves-effect"><a href="#!">4</a></li>
+									<li class="waves-effect"><a href="#!">5</a></li>
+									<li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+								</ul>
+							</div>
+							<div class="col s4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="식물명, 지점, 관리자, 구매자" id="plant_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page4">
+					<div class="top_">
+						<div class="left"><h2>회원 관리</h2></div>
+						<div class="right"><input type="checkbox" id="seemember"><label for="seemember">관리중인 식물의 <br>구매자만 보기</label></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>회원명</th>
+									<th>가입일</th>
+									<th>구매식물수</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="memeber_" id="member5">
+									<td>5</td>
+									<td>회원 5</td>
+									<td>17.02.05</td>
+									<td>8</td>
+								</tr>
+								<tr class="memeber_" id="member4">
+									<td>4</td>
+									<td>회원 4</td>
+									<td>17.02.04</td>
+									<td>4</td>
+								</tr>
+								<tr class="memeber_" id="member3">
+									<td>3</td>
+									<td>회원 3</td>
+									<td>17.02.03</td>
+									<td>1</td>
+								</tr>
+								<tr class="memeber_" id="member2">
+									<td>2</td>
+									<td>회원 2</td>
+									<td>17.02.02</td>
+									<td>3</td>
+								</tr>
+								<tr class="memeber_" id="member1">
+									<td>1</td>
+									<td>회원 1</td>
+									<td>17.02.01</td>
+									<td>4</td>
+								</tr>
+							</tbody>
+						</table>
+						
+						<div class="row pagination_wrapper">
+							<div class="col offset-s4 s4 center-align">
+								<ul class="pagination">
+									<li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+									<li class="active"><a href="#!">1</a></li>
+									<li class="waves-effect"><a href="#!">2</a></li>
+									<li class="waves-effect"><a href="#!">3</a></li>
+									<li class="waves-effect"><a href="#!">4</a></li>
+									<li class="waves-effect"><a href="#!">5</a></li>
+									<li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+								</ul>
+							</div>
+							<div class="col s4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="회원명" id="member_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				<div class="pages page5">
+					<div class="top_">
+						<div class="left"><h2>매니저 관리</h2></div>
+						<div class="right">
+							<a href="#" class="btn" onclick="add_manager()">매니저 추가</a>
+						</div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>이름</th>
+									<th>지점</th>
+									<th>연락처</th>
+									<th>관리중인 식물 수</th>
+									<th>총 답변 수</th>
+									<th>매니저 관리</th>
+									<th>지점 관리</th>
+									<th>전문가 답변</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="manager_" id="manager_4">
+									<td>4</td>
+									<td>애드민 관리자</td>
+									<td>영등포</td>
+									<td>010-0000-0000</td>
+									<td>4</td>
+									<td>0</td>
+									<td><input type="checkbox" id="manage_all_4" checked="checked" disabled="disabled"><label for="manage_all_4"></label></td>
+									<td><input type="checkbox" id="manage_place_4" checked="checked" disabled="disabled"><label for="manage_place_4"></label></td>
+									<td><input type="checkbox" id="manage_answer_4" checked="checked" disabled="disabled"><label for="manage_answer_4"></label></td>
+								</tr>
+								<tr class="manager_" id="manager_3">
+									<td>3</td>
+									<td>관리자3</td>
+									<td>용인</td>
+									<td>010-0000-0000</td>
+									<td>7</td>
+									<td>34</td>
+									<td><input type="checkbox" id="manage_all_3" disabled="disabled"><label for="manage_all_3"></label></td>
+									<td><input type="checkbox" id="manage_place_3" checked="checked" disabled="disabled"><label for="manage_place_3"></label></td>
+									<td><input type="checkbox" id="manage_answer_3" checked="checked" disabled="disabled"><label for="manage_answer_3"></label></td>
+								</tr>
+								<tr class="manager_" id="manager_2">
+									<td>2</td>
+									<td>관리자2</td>
+									<td>수원</td>
+									<td>010-0000-0000</td>
+									<td>19</td>
+									<td>26</td>
+									<td><input type="checkbox" id="manage_all_2" disabled="disabled"><label for="manage_all_2"></label></td>
+									<td><input type="checkbox" id="manage_place_2" disabled="disabled"><label for="manage_place_2"></label></td>
+									<td><input type="checkbox" id="manage_answer_2" checked="checked" disabled="disabled"><label for="manage_answer_2"></label></td>
+								</tr>
+								<tr class="manager_" id="manager_1">
+									<td>1</td>
+									<td>관리자1</td>
+									<td>과천</td>
+									<td>010-0000-0000</td>
+									<td>43</td>
+									<td>3</td>
+									<td><input type="checkbox" id="manage_all_1" disabled="disabled"><label for="manage_all_1"></label></td>
+									<td><input type="checkbox" id="manage_place_1" checked="checked" disabled="disabled"><label for="manage_place_1"></label></td>
+									<td><input type="checkbox" id="manage_answer_1" disabled="disabled"><label for="manage_answer_1"></label></td>
+								</tr>
+							</tbody>
+						</table>
+						
+						<div class="row pagination_wrapper">
+							<div class="col offset-s4 s4 center-align">
+								<ul class="pagination">
+									<li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+									<li class="active"><a href="#!">1</a></li>
+									<li class="waves-effect"><a href="#!">2</a></li>
+									<li class="waves-effect"><a href="#!">3</a></li>
+									<li class="waves-effect"><a href="#!">4</a></li>
+									<li class="waves-effect"><a href="#!">5</a></li>
+									<li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+								</ul>
+							</div>
+							<div class="col s4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="매니저명" id="manager_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page6">
+					<div class="top_">
+						<div class="left"><h2>마이페이지</h2></div>
+						<div class="right">
+							<a href="#" class="btn" onclick="mypage_adjust()">내 정보 수정</a>
+						</div>
+					</div>
+					<div class="main_">
+						<div class="row">
+							<div class="col s6 mypage_" >
+								<label for="mypage_name">이름: &nbsp;</label>
+								<span id="mypage_name">매니저1</span>
+							</div>
+						</div>
+							
+						<div class="row">
+							<div class="col s6 mypage_">
+								<label for="mypage_tel">전화번호: &nbsp;</label>
+								<span id="mypage_tel">010-1234-4567</span>
+							</div>
+						</div>
+							
+						<div class="row">
+							<div class="col s6 mypage_" id="mypage_email">
+								<label for="mypage_email">이메일: &nbsp;</label>
+								<span id="mypage_email">mgr1@gmail.com</span>
+							</div>
+						</div>
+							
+						<div class="row">
+							<div class="col s6 mypage_">
+								<label for="mypage_place">지점: &nbsp;</label>
+								<span id="mypage_place">용인 식물공장 연구소 지점</span>
+							</div>
+						</div>
+							
+						<div class="row">
+							<p><input type="checkbox" id="mypage_manage"><label for="mypage_manage">매니저 관리 권한</label></p>
+							<p><input type="checkbox" id="mypage_place_manage"><label for="mypage_place_manage">지점 매니저</label></p>
+							<p><input type="checkbox" id="mypage_qa_auth"><label for="mypage_qa_auth">전문가 답변 권한</label></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_qa">
+				<div class="top_">
+					<div class="left"><h2>회원 질문</h2></div>
+					<div class="right"><a href="#" class="btn red" onclick="goto_pages()">질문 삭제</a></div>
+				</div>
+				<div class="main_">
+					<div class="row memeber_top">
+						<div class="input-field col s5">
+							<input id="memeber_q_title_5" type="text" class="validate" value="회원의 질문 제목5">
+							<label for="memeber_q_title_5">질문 제목</label>
+						</div>
+						<div class="input-field col s5">
+							<input id="memeber_q_date_5" type="text" class="validate" value="15.10.11">
+							<label for="memeber_q_date_5">질문 등록일</label>
+						</div>
+						<div class="input-field col s2">
+							<input disabled id="memeber_id" type="text" class="validate" value="22">
+							<label for="memeber_id">등록자</label>
+						</div>
+					</div>
+      		
+       		<div class="row">
+       			<div class="input-field col s12">
+							<textarea id="memeber_q_content_5" class="materialize-textarea">회원의 질문 내용 blah blah</textarea>
+							<label for="memeber_q_content_5">질문 내용</label>
+       			</div>
+       		</div>
+        	<a id="member_a" href="#" class="btn">답변 작성</a>
+        	<div id="member_a_area" class="row">
+        		<div class="input-field col s12">
+							<textarea id="memeber_a_5" class="materialize-textarea"></textarea>
+							<label for="memeber_a_5">답변 내용</label>
+        		</div>
+        	</div>
+        	<div class="row memeber_d">
+        		<div class="col s12 right-align">
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a>&nbsp;
+        			<a href="#" class="btn" onclick="goto_pages()">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_guide">
+				<div class="top_">
+					<div class="left"><h2>가이드 수정</h2></div>
+					<div class="right"><input type="checkbox" id="seeguide"><label for="seeguide">가이드 표시함</label></a></div>
+				</div>
+				<div class="main_">
+						<div class="row memeber_top">
+							<div class="input-field col s12">
+								<input id="guide_title_5" type="text" class="validate" value="첫번째 가이드">
+								<label for="guide_title_5">질문 제목</label>
+							</div>
+						</div>
+
+						<form action="#">
+							<div class="file-field input-field">
+								<div class="btn">
+									<span>파일</span>
+									<input type="file" multiple>
+								</div>
+								<div class="file-path-wrapper">
+									<input class="file-path validate" type="text" placeholder="한개 또는 여러개 파일을 선택해주세요">
+								</div>
+							</div>
+						</form>
+
+						<div class="row">
+							<div class="input-field col s12">
+								<textarea id="guide_content_5" class="materialize-textarea">가이드 내용 blah blah</textarea>
+								<label for="guide_content_5">가이드 내용</label>
+							</div>
+						</div>
+       		
+       		<div id="add_guide"></div>
+					
+        	<div class="row guide_d">
+        	<div class="col s2 left-align">
+        		<a href="#!" class="btn transparent black-text" onclick="add_guide_content()">내용 추가</a>
+        	</div>
+        		<div class="col s10 right-align">
+        			<a href="#" class="btn red" onclick="goto_pages()">삭제</a>&nbsp;
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a>&nbsp;
+        			<a href="#" class="btn" onclick="goto_pages()">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_guide_add">
+				<div class="top_">
+					<div class="left"><h2>가이드 추가</h2></div>
+				</div>
+				<div class="main_">
+						<div class="row memeber_top">
+							<div class="input-field col s12">
+								<input id="guide_add_title_5" type="text" class="validate" placeholder="제목을 입력하세요">
+								<label for="guide_add_title_5">질문 제목</label>
+							</div>
+						</div>
+
+						<form action="#">
+							<div class="file-field input-field">
+								<div class="btn">
+									<span>파일</span>
+									<input type="file" multiple>
+								</div>
+								<div class="file-path-wrapper">
+									<input class="file-path validate" type="text" placeholder="한개 또는 여러개 파일을 선택해주세요">
+								</div>
+							</div>
+						</form>
+
+						<div class="row">
+							<div class="input-field col s12">
+								<textarea id="guide_add_content_5" class="materialize-textarea" placeholder="가이드 내용을 입력하세요"></textarea>
+								<label for="guide_add_content_5">가이드 내용</label>
+							</div>
+						</div>
+						
+       		<div id="add_guide2"></div>
+					
+        	<div class="row guide_d">
+        	<div class="col s2 left-align">
+        		<a href="#!" class="btn transparent black-text" onclick="add_guide_content2()">내용 추가</a>
+        	</div>
+        		<div class="col s10 right-align">
+        			<a href="#" class="btn red" onclick="goto_pages()">삭제</a>&nbsp;
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a>&nbsp;
+        			<a href="#" class="btn" onclick="goto_pages()">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_plant">
+				<div class="top_">
+					<div class="left"><h2>식물 관리 상세</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div id="plant_manager" class="col s12">
+							<h5>관리자 : 관리자5</h5>
+						</div>
+					</div>
+					<div class="row">
+						<div id="plant_buyer" class="col s3">식물명 (구매자5)</div>
+						<div id="plant_place" class="col s3">용인 식물공장 연구소</div>
+						<div id="plant_date" class="col s3">최초 등록일: 17.02.05</div>
+						<div id="plant_harvest_stat" class="col s2">수확전</div>
+					</div>
+					<div class="row">
+						<div class="col s12">
+							<div class="plant_title">일지 갱신일 : 17.02.05</div>
+							<div class="plant_content">
+								<img src="img/profile.jpg" width="30%" alt="">
+								<img src="img/profile.jpg" width="30%" alt="">
+								<img src="img/profile.jpg" width="30%" alt="">
+								<br>
+								<table>
+									<thead>
+										<tr>
+											<th>온도</th>
+											<th>습도</th>
+											<th>광량</th>
+											<th>CO2 농도</th>
+											<th>PH</th>
+											<th>EC</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><span>25</span> °C</td>
+											<td><span>50</span> %</td>
+											<td><span>2.14</span> μmol</td>
+											<td><span>00</span></td>
+											<td><span>00</span></td>
+											<td><span>10uS/cm</span></td>
+										</tr>
+										<tr>
+											<td>
+												<h5>일지 내용</h5>
+												blah blah
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">뒤로</a>
+					</div>
+				</div>
+				
+			</div>
+			<div class="inner_page page_qr">
+				<div class="top_">
+					<div class="left"><h2>QR 코드 인쇄</h2></div>
+					<div class="right"><a href="#" class="btn" onclick="window.print()">QR코드 인쇄</a></div>
+				</div>
+				<div class="main_">
+					<ul id="print_area">
+						<li id="qr_id6">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장6)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.06</span>
+						</li>
+						<li id="qr_id5">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장5)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.05</span>
+						</li>
+						<li id="qr_id4">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장4)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.04</span>
+						</li>
+						<li id="qr_id3">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장3)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.03</span>
+						</li>
+						<li id="qr_id2">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장2)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.02</span>
+						</li>
+						<li id="qr_id1">
+							<div><img width="250px" src="img/profile.jpg" alt=""><br></div>
+							<br>
+							<span class="qr_name">식물명 (구매장1)</span><br>
+							<br>
+							<span class="qr_date">최초 등록일: 17.02.01</span>
+						</li>
+					</ul>
+					
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">뒤로</a>&nbsp;　&nbsp;
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_manager">
+				<div class="top_">
+					<div class="left"><h2>매니저 정보 수정</h2></div>
+				</div>
+				<div class="main_">
+					<table>
+						<thead>
+							<tr>
+								<th>매니저 이름</th>
+								<th>전화번호</th>
+								<th>이메일</th>
+								<th>지점</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>매니저4</td>
+								<td>010-1234-4567</td>
+								<td>mgr1@gmail.com</td>
+								<td>
+									<select>
+										<option value="1" selected>용이 식물공장 연구소 지점</option>
+										<option value="2">Option 1</option>
+										<option value="3">Option 2</option>
+										<option value="4">Option 3</option>
+									</select>
+    							<label>지점</label>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+        
+        
+					<p><input type="checkbox" id="manager_manage"><label for="manager_manage">매니저 관리 권한</label></p>
+					<p><input type="checkbox" id="manager_place"><label for="manager_place">지점 매니저</label></p>
+					<p><input type="checkbox" id="manager_qa_auth"><label for="manager_qa_auth">전문가 답변 권한</label></p>
+					<div class="manager_bottom right">
+						<a href="#modal_temp_pw" class="btn red modal-trigger">임시 패스워드 발급</a> &nbsp;
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()" >취소</a> &nbsp;
+						<a href="#" class="btn" onclick="goto_pages()">확인</a>
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_manager_add">
+				<div class="top_">
+					<div class="left"><h2>매니저 추가</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="input-field col s6">
+							<input placeholder="매니저 명 입력" id="manager_name" type="text" class="validate">
+							<label for="manager_name">매니저 명</label>
+						</div>
+						<div class="input-field col s6">
+							<input placeholder="전화번호 입력" id="manager_tel" type="tel" class="validate">
+							<label for="manager_tel">전화번호</label>
+						</div>
+						<div class="input-field col s6">
+							<input placeholder="이메일 입력" id="manager_email" type="email" class="validate">
+							<label for="manager_email">이메일</label>
+						</div>
+						<div class="input-field col s6">
+							<select>
+								<option value="" disabled selected>지점 선택</option>
+								<option value="1">지점 1</option>
+								<option value="2">지점 2</option>
+								<option value="3">지점 3</option>
+							</select>
+							<label>지점</label>
+						</div>
+					</div>
+					
+					<p><input type="checkbox" id="manager_add_manage"><label for="manager_add_manage">매니저 관리 권한</label></p>
+					<p><input type="checkbox" id="manager_add_place"><label for="manager_add_place">지점 매니저</label></p>
+					<p><input type="checkbox" id="manager_add_qa_auth"><label for="manager_add_qa_auth">전문가 답변 권한</label></p>
+					<div class="manager_add_bottom right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a> &nbsp;
+						<a href="#" class="btn" onclick="goto_pages()">확인</a>
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_mypage_adjust">
+				<div class="top_">
+					<div class="left"><h2>내 정보 수정</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="input-field col s6">
+							<input value="매니저1" id="mypage_adjust_name" type="text" class="validate">
+							<label for="mypage_adjust_name">이름</label>
+						</div>
+						<div class="input-field col s6">
+							<input value="010-1234-4567" id="mypage_adjust_tel" type="tel" class="validate">
+							<label for="mypage_adjust_tel">전화번호</label>
+						</div>
+						<div class="input-field col s6">
+							<input value="mgr1@gmail.com" id="mypage_adjust_email" type="email" class="validate">
+							<label for="mypage_adjust_email">이메일</label>
+						</div>
+						<div class="input-field col s6">
+							<select>
+								<option value="1" selected>용인 식물공장 연구소 지점</option>
+								<option value="2">지점 1</option>
+								<option value="3">지점 2</option>
+								<option value="4">지점 3</option>
+							</select>
+							<label>지점</label>
+						</div>
+					</div>
+
+					<div class="row">
+						<p><input type="checkbox" id="mypage_adjust_manage" disabled="disabled"><label for="mypage_adjust_manage">매니저 관리 권한</label></p>
+						<p><input type="checkbox" id="mypage_adjust_place"><label for="mypage_adjust_place">지점 매니저</label></p>
+						<p><input type="checkbox" id="mypage_adjust_qa_auth"><label for="mypage_adjust_qa_auth">전문가 답변 권한</label></p>
+					</div>
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a> &nbsp;
+						<a href="#" class="btn" onclick="goto_pages()">확인</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="guide_wrapper" style="display:none">
+			<form action="#">
+				<div class="file-field input-field">
+					<div class="btn">
+						<span>파일</span>
+						<input type="file" multiple>
+					</div>
+					<div class="file-path-wrapper">
+						<input class="file-path validate" type="text" placeholder="한개 또는 여러개 파일을 선택해주세요">
+					</div>
+				</div>
+			</form>
+
+			<div class="row">
+				<div class="input-field col s12">
+					<textarea id="guide_content_" class="materialize-textarea" placeholder="가이드 내용을 입력해주세요"></textarea>
+					<label for="guide_content_">가이드 내용</label>
+				</div>
+			</div>
+		</div>
+		
+		<div id="modal_temp_pw" class="modal row center-align">
+			<div class="input-field col s12">
+				<input type="text" placeholder="임시 비밀번호를 입력해 주세요">
+			</div>
+			<div class="col s12">
+				<a href="#" class="btn transparent black-text" onclick="$('#modal_temp_pw').modal('close');">취소</a> &nbsp;
+				<a href="#" class="btn" onclick="$('#modal_temp_pw').modal('close');">확인</a>
+			</div>
+		</div>
+  </body>
+</html>

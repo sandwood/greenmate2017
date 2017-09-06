@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link rel="icon" href="/img/icon_logo.png">
+		<title>GREEN MATE</title>
+    <link rel="stylesheet" type="text/css" href="css/materialize.min.css"  media="screen,projection"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/jquery.qrcode.min.js"></script>
+    <script type="text/javascript" src="js/stupidtable.min.js"></script>
+    <script type="text/javascript" src="js/jquery.lazyload.min.js"></script>
+
+    <script>
+			var add_guide_counter = 0;
+      $(document).ready(function(){
+				window.onbeforeunload = function() { return "You work will be lost."; };
+				$('.modal').modal();
+				$('#modal_register').modal({
+					dismissible: false
+				});
+    		$('select').material_select();
+				$('.login_').click(function(){
+					var id_ = $('#id').val();
+					var pw_ = $('#password').val();
+					loading_active();
+					login(id_,pw_);
+				})
+				$('.left_nav li').click(function(){
+					if($(this).attr('id') == 'logout'){
+					}
+					else{
+						goto_pages();
+						removeall_active();
+						$(this).addClass('active');
+						var temp_id = $(this).attr('id');
+						$('.' + temp_id).addClass('active');
+
+						if($(this).attr('id') == 'page1'){
+							start_qa_pages();
+						}
+						else if($(this).attr('id') == 'page2'){
+							start_guide_pages();
+						}
+						else if($(this).attr('id') == 'page3'){
+							start_plant();
+							get_userIds();
+						}
+						else if($(this).attr('id') == 'page4'){
+							start_managing_user();
+						}
+						else if($(this).attr('id') == 'page5'){
+							start_managing_manager();
+						}
+						else if($(this).attr('id') == 'page6'){
+							mypage();
+						}
+					}
+				})
+				$('#qa_').delegate('tr.qa_', 'click', function(){
+					var id = $(this).attr('id');
+					goto_innerpage();
+					$('.page_qa').css('display','inherit');
+					goto_inner_qa(id);
+				});
+				$('#guide_').delegate('tr.guide_', 'click', function(){
+					var id = $(this).attr('id');
+					goto_innerpage();
+					$('.page_guide').css('display','inherit');
+					goto_inner_guide(id);
+				});
+				$('tr.guide_ td:not(:last-child)').click(function(){
+					goto_innerpage();
+					$('.page_guide').css('display','inherit');
+				})
+				$('tr.plant_ td:not(:first-child)').click(function(){
+					goto_innerpage();
+					$('.page_plant').css('display','inherit');
+				})
+				$('#add_plant_btn').click(function(){
+					goto_innerpage();
+					$('.page_plant_add').css('display','inherit');
+					$('#plantName').val('');
+					$('#userId_autucomplete').val('');
+					$('#plantPosition').val('');
+					$('#plantSpecies').val('');
+					$('#plantGateway').val('f4b85e0294e9');
+				})
+				$('tr.manager_').click(function(){
+					goto_innerpage();
+					$('.page_manager').css('display','inherit');
+				})
+				$('#member_a').click(function(){
+					$('#member_a').css('display','none');
+					$('#member_a_area').css('display','inherit');
+				})
+				$('#seeqa').click(function(){
+					var chk = $(this).is(':checked');
+					if(chk) {
+						start_qa_no_a();
+					}
+					else{
+						start_qa_pages();
+					}
+				});
+				$('#seeplant').click(function(){
+					var chk = $(this).is(':checked');
+					if(chk) {
+						start_plant_mine();
+					}
+					else{
+						start_plant();
+					}
+				});
+				$('#seemember').click(function(){
+					var chk = $(this).is(':checked');
+					if(chk) {
+						start_managing_user_plants();
+					}
+					else{
+						start_managing_user();
+					}
+				});
+				$('#plant_').delegate('tr.plant_ td', 'click', function(){
+					if($(this).is('td:not(:first-child)')){
+						var id = $(this).siblings('.hidden_plant_id').html();
+						goto_innerpage();
+						$('.page_plant').css('display','inherit');
+						goto_inner_plant(id);
+					}
+					else{
+					}
+				})
+				$('#modal_agreement_close').click(function(){
+  				$('#modal_agreement_close').modal('close');
+				})
+				$('#register_btn').click(function(){
+						$.get("agreement.txt", function(data) {
+							$("#agreement_text").html(data);
+						});
+					})
+				});
+
+			var temp_block;
+			function removeall_active(){
+				$('.left_nav li').removeClass('active');
+				$('.pages').removeClass('active');
+			}
+			function goto_innerpage(){
+				$('.pages_wrapper').css('display','none');
+			}
+			function goto_pages(){
+				$('.pages_wrapper').css('display','inherit');
+				$('.inner_page').css('display','none');
+				add_guide_counter = 0;
+				$('.inner_page #add_guide').empty();
+				$('.inner_page #add_guide2').empty();
+			}
+			function add_guide_content(){
+				var $div = $('div[id^="guide_contents_"]:last');
+				var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+				var $klon = $div.clone().prop('id', 'guide_contents_'+num );
+    		$('#add_guide').append(`
+					<div id="guide_contents_`+num+`" class="row guide_contents_wrapper">
+						<a href="#!" onclick="delete_guide_wrapper(this)" class="delete_guide_wrapper btn red">삭제</a>
+						<div class="col s12">
+							<div class="additional_guide_pics" id="additional_guide_pics_`+num+`">
+								<img src="" id="guide_pics_`+num+`" alt="">
+							</div>
+						</div>
+
+						<div class="col s12">
+							<form id="modify_form_`+num+`" method="POST" enctype="multipart/form-data">
+								<div class="file-field input-field">
+									<div class="btn">
+										<span>파일</span>
+										<input class="guide_add_file" id="guide_file_`+num+`" type="file" name="file`+num+`[]" accept="image/*">
+									</div>
+									<div class="file-path-wrapper">
+										<input id="guide_file_url_`+num+`" class="file-path" type="text" placeholder="파일을 선택해주세요">
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<div class="input-field col s12">
+							<textarea id="guide_content_`+num+`" class="materialize-textarea"></textarea>
+							<label for="guide_content_`+num+`">가이드 내용</label>
+						</div>
+					</div>
+				`);
+
+//
+//				var html_string = $('.guide_wrapper').html();
+//				add_guide_counter++;
+//				$('#guide_content_').attr('id','guide_content_'+add_guide_counter);
+//				$('#add_guide').append(html_string);
+			}
+			function add_guide_content2(){
+				var $div = $('div[id^="guide_contents_add_"]:last');
+				var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+				var $klon = $div.clone().prop('id', 'guide_contents_add_'+num );
+    		$('#add_guide2').append(`
+					<div id="guide_contents_add_`+num+`" class="row guide_contents_wrapper">
+						<a href="#!" onclick="delete_guide_wrapper(this)" class="delete_guide_wrapper btn red">삭제</a>
+						<div class="col s12">
+							<div class="additional_guide_pics" id="additional_guide_pics2_`+num+`">
+								<img src="" id="guide_pics2_`+num+`" alt="">
+							</div>
+						</div>
+
+						<div class="col s12">
+							<form id="add_form_`+num+`" method="POST" enctype="multipart/form-data">
+								<div class="file-field input-field">
+									<div class="btn">
+										<span>파일</span>
+										<input class="guide_add_file" id="guide_add_file_`+num+`" type="file" name="file`+num+`[]" accept="image/*">
+									</div>
+									<div class="file-path-wrapper">
+										<input id="guide_add_file_url_`+num+`" class="file-path" type="text" placeholder="파일을 선택해주세요">
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<div class="input-field col s12">
+							<textarea id="guide_content_`+num+`" class="materialize-textarea"></textarea>
+							<label for="guide_content_`+num+`">가이드 내용</label>
+						</div>
+					</div>
+				`);
+
+				$('.guide_add_file:file').change(function(){
+					upload_img(this);
+				});
+			}
+			function qr_print(){
+				if($('#qr_checker .chip').length == 0){
+					alert('식물을 선택해주세요');
+				}
+				else{
+					var qr_array = [];
+					var qr_plantname = [];
+					var qr_place = [];
+					var qr_date = [];
+					goto_innerpage();
+					$('.page_qr').css('display','inherit');
+					$('#print_area').empty();
+					for(var i=0; i<$('#qr_checker .chip').length; i++){
+						qr_array[i] = $('#qr_checker .chip')[i].id;
+						var qr_place = $('#'+qr_array[i]+' .place_chip').html();
+						var qr_plantname = $('#'+qr_array[i]+' .plantname_chip').html();
+						var qr_date = $('#'+qr_array[i]+' .date_chip').html();
+						qr_array[i] = qr_array[i].replace('qr_check_','');
+
+						$('#print_area').append(`
+								<li class="qr_wrapper">
+									<div id="qr_`+qr_array[i]+`_`+i+`"></div><br>
+									<span class="qr_name">식물명: `+qr_plantname+`</span><br>
+									<span>지점: `+qr_place+`</span><br>
+									<span class="qr_date">최초 등록일: `+qr_date+`</span>
+								</li>
+						`);
+						$('#qr_'+qr_array[i]+`_`+i).qrcode(qr_array[i]);
+					}
+				}
+
+			}
+
+			function add_manager(){
+				$('#manager_name').val('');
+				$('#manager_tel').val('');
+				$('#manager_id').val('');
+				$('#manager_factory').val('');
+				$('#manager_pw').val('');
+				$('#manager_pw_confirm').val('');
+				goto_innerpage();
+				$('.page_manager_add').css('display','inherit');
+			}
+
+			function loading_active(){
+				if($('.loader').hasClass('active')){
+					$('.loader').removeClass('active');
+				}
+				else{
+					$('.loader').addClass('active');
+				}
+			}
+
+
+			function login(id_, pw_){
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/login',
+					data: {
+						id: id_,
+						password: pw_
+					}
+					}).success(function( data, textStatus, jqXHR ){
+					console.log(data);
+					if(data.authLevel==1){
+						if(data.isSuccess == 1){
+							$('.login_page').addClass('active');
+							$('.loader').removeClass('active');
+							$('#userSeq').html(data.userSeq);
+							start_qa_pages();
+						}
+						else if(data.isSuccess == 0){
+							alert(data.statusText);
+							loading_active();
+						}
+						
+						$('#page5').css('display','none');
+						$('#page4').css('border-bottom','1px solid #ccc');
+					}
+					else if(data.authLevel==2){
+						if(data.isSuccess == 1){
+							$('.login_page').addClass('active');
+							$('.loader').removeClass('active');
+							$('#userSeq').html(data.userSeq);
+							start_qa_pages();
+						}
+						else if(data.isSuccess == 0){
+							alert(data.statusText);
+							loading_active();
+						}
+					}
+					else{
+						alert('메니저만 로그인 할 수 있습니다.');
+						loading_active();
+					}
+				});
+			}
+			function logout(){
+				$('.login_page').removeClass('active');
+				$('.loader').addClass('active');
+				$.ajax({
+					type: "GET",
+					url: 'https://greenmate-163904.appspot.com/logout',
+					data:{	}
+					}).success(function( data, textStatus, jqXHR ){
+						if(data.isSuccess == 1){
+							$('.loader').removeClass('active');
+							alert('로그아웃 되었습니다!')
+						}
+					});
+			}
+
+
+			$.getScript("js/page1.js");
+			$.getScript("js/page2.js");
+			$.getScript("js/page3.js");
+
+
+			function start_managing_user(){
+				$('#seemember').attr('checked', false);
+				loading_active();
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/managingUser',
+					data:{
+						page: 1,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#memeber_manage').empty();
+						for(var i=0; i<data.userList.length; i++){
+							var username = data.userList[i].username;
+							var published_date = data.userList[i].published_date;
+							var managingPlants = data.userList[i].managingPlants;
+
+							$('#memeber_manage').append(
+								`<tr class="memeber_" id="member`+username+`">
+									<td>`+username+`</td>
+									<td>`+published_date+`</td>
+									<td>`+managingPlants+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						$.ajax({
+							type: "POST",
+							url: 'https://greenmate-163904.appspot.com/manager/managingUser',
+							data:{
+							},
+							success: function( data, textStatus, jqXHR ){
+								if(data.userList.length>5){
+									var memeber_manage_page = data.userList.length/5;
+									memeber_manage_page = Math.ceil(memeber_manage_page);
+								}
+								else{
+									var memeber_manage_page = 1;
+								}
+								$('.memeber_manage_pagination').empty();
+								$('.memeber_manage_pagination').append('<li class="active"><a href="#!">1</a></li>');
+								for(var i=2; i<memeber_manage_page+1; i++){
+									$('.memeber_manage_pagination').append('<li class="waves-effect"><a href="#!">'+i+'</a></li>');
+								}
+								goto_memeber_manage_pages();
+							},
+							complete: function(){
+								loading_active();
+							}
+						});
+					}
+				});
+			}
+			function goto_memeber_manage_pages(){
+				$('.memeber_manage_pagination li').click(function(){
+					loading_active();
+					var memeber_manage_page = $(this).children().html();
+					$(".memeber_manage_pagination li").removeClass('active');
+					$(this).addClass('active');
+					get_memeber_manage_pages(memeber_manage_page);
+				})
+			}
+			function get_memeber_manage_pages(memeber_manage_page){
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/managingUser',
+					data:{
+						page: memeber_manage_page,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#memeber_manage').empty();
+						for(var i=0; i<data.userList.length; i++){
+							var username = data.userList[i].username;
+							var published_date = data.userList[i].published_date;
+							var managingPlants = data.userList[i].managingPlants;
+
+							$('#memeber_manage').append(
+								`<tr class="memeber_" id="member`+username+`">
+									<td>`+username+`</td>
+									<td>`+published_date+`</td>
+									<td>`+managingPlants+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						loading_active();
+					}
+				});
+			}
+
+			function start_managing_user_plants(){
+				loading_active();
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/activePlantUserList',
+					data:{
+						page: 1,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#memeber_manage').empty();
+						for(var i=0; i<data.plants.length; i++){
+							var username = data.plants[i].username;
+							var created_at = data.plants[i].created_at;
+							var numberOfPlants = data.plants[i].numberOfPlants;
+
+							$('#memeber_manage').append(
+								`<tr class="memeber_" id="member`+username+`">
+									<td>`+username+`</td>
+									<td>`+created_at+`</td>
+									<td>`+numberOfPlants+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						$.ajax({
+							type: "POST",
+							url: 'https://greenmate-163904.appspot.com/manager/activePlantUserList',
+							data:{
+							},
+							success: function( data, textStatus, jqXHR ){
+								console.log(data);
+								if(data.users.length>5){
+									var memeber_manage_page = data.users.length/5;
+									memeber_manage_page = Math.ceil(memeber_manage_page);
+								}
+								else{
+									var memeber_manage_page = 1;
+								}
+								$('.memeber_manage_pagination').empty();
+								$('.memeber_manage_pagination').append('<li class="active"><a href="#!">1</a></li>');
+								for(var i=2; i<memeber_manage_page+1; i++){
+									$('.memeber_manage_pagination').append('<li class="waves-effect"><a href="#!">'+i+'</a></li>');
+								}
+								goto_managing_user_plants_pages();
+							},
+							complete: function(){
+								loading_active();
+							}
+						});
+					}
+				})
+			}
+			function goto_managing_user_plants_pages(){
+				$('.memeber_manage_pagination li').click(function(){
+					loading_active();
+					var memeber_manage_page = $(this).children().html();
+					$(".memeber_manage_pagination li").removeClass('active');
+					$(this).addClass('active');
+					get_managing_user_plants_pages(memeber_manage_page);
+				})
+			}
+			function get_managing_user_plants_pages(memeber_manage_page){
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/activePlantUserList',
+					data:{
+						page: memeber_manage_page,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#memeber_manage').empty();
+						for(var i=0; i<data.plants.length; i++){
+							var username = data.plants[i].username;
+							var created_at = data.plants[i].created_at;
+							var numberOfPlants = data.plants[i].numberOfPlants;
+
+							$('#memeber_manage').append(
+								`<tr class="memeber_" id="member`+username+`">
+									<td>`+username+`</td>
+									<td>`+created_at+`</td>
+									<td>`+numberOfPlants+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						loading_active();
+					}
+				});
+			}
+
+			function start_managing_manager(){
+				loading_active();
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/getAllManager',
+					data:{
+						page: 1,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#manage_manager').empty();
+						for(var i=0; i<data.managerList.length; i++){
+							var authLevel = data.managerList[i].authLevel;
+							var call = data.managerList[i].call;
+							var factory = data.managerList[i].factory;
+							var managerName = data.managerList[i].managerName;
+							var managingPlants = data.managerList[i].managingPlants;
+							var numberOfAnswer = data.managerList[i].numberOfAnswer
+
+							$('#manage_manager').append(
+								`<tr class="manager_" id="manager_`+managerName+`">
+									<td>`+managerName+`</td>
+									<td>`+call+`</td>
+									<td>`+factory+`</td>
+									<td>`+managingPlants+`</td>
+									<td>`+numberOfAnswer+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						$.ajax({
+							type: "POST",
+							url: 'https://greenmate-163904.appspot.com/manager/getAllManager',
+							data:{
+							},
+							success: function( data, textStatus, jqXHR ){
+								if(data.managerList.length>5){
+									var manager_manager_page = data.managerList.length/5;
+									manager_manager_page = Math.ceil(manager_manager_page);
+								}
+								else{
+									var manager_manager_page = 1;
+								}
+								$('.manage_manager_pagination').empty();
+								$('.manage_manager_pagination').append('<li class="active"><a href="#!">1</a></li>');
+								for(var i=2; i<manager_manager_page+1; i++){
+									$('.manage_manager_pagination').append('<li class="waves-effect"><a href="#!">'+i+'</a></li>');
+								}
+								goto_manager_manager_pages();
+							},
+							complete: function(){
+								loading_active();
+							}
+						});
+					}
+				});
+			}
+
+			function goto_manager_manager_pages(){
+				$('.manage_manager_pagination li').click(function(){
+					loading_active();
+					var manager_manager_page = $(this).children().html();
+					$(".manage_manager_pagination li").removeClass('active');
+					$(this).addClass('active');
+					get_manager_manager_pages(manager_manager_page);
+				})
+			}
+			function get_manager_manager_pages(manager_manager_page){
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/getAllManager',
+					data:{
+						page: manager_manager_page,
+						pageNumber: 5
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data);
+
+						$('#manage_manager').empty();
+						for(var i=0; i<data.managerList.length; i++){
+							var authLevel = data.managerList[i].authLevel;
+							var call = data.managerList[i].call;
+							var factory = data.managerList[i].factory;
+							var managerName = data.managerList[i].managerName;
+							var managingPlants = data.managerList[i].managingPlants;
+							var numberOfAnswer = data.managerList[i].numberOfAnswer
+
+							$('#manage_manager').append(
+								`<tr class="manager_" id="manager_`+managerName+`">
+									<td>`+managerName+`</td>
+									<td>`+call+`</td>
+									<td>`+factory+`</td>
+									<td>`+managingPlants+`</td>
+									<td>`+numberOfAnswer+`</td>
+								</tr>`
+							);
+						}
+					},
+					complete: function(){
+						loading_active();
+					}
+				});
+			}
+
+			function confirm_manager_add(){
+				if($('#manager_name').val().length < 2 || $('#manager_tel').val().length < 11 || $('#manager_id').val().length < 5 || $('#manager_factory').val().length < 3 || $('#manager_pw').val().length < 5){
+					alert('입력을 확인해주세요');
+				}
+				else{
+					if($('#manager_pw').val() == $('#manager_pw_confirm').val()){
+						 add_manager_progress();
+					}
+					else{
+						alert('비밀번호가 다릅니다.');
+					}
+				}
+			}
+			function add_manager_progress(){
+				var manager_name = $('#manager_name').val();
+				var manager_tel = $('#manager_tel').val();
+				var manager_id = $('#manager_id').val();
+				var manager_factory = $('#manager_factory').val();
+				var manager_pw = $('#manager_pw').val();
+
+				loading_active();
+				$.ajax({
+					type: "POST",
+					url: 'https://greenmate-163904.appspot.com/manager/addManager',
+					data:{
+						username: manager_name,
+						id: manager_id,
+						password: manager_pw,
+						call: manager_tel,
+						factory: manager_factory
+					},
+					success: function( data, textStatus, jqXHR ){
+						if(data.isSuccess == 1){
+							alert('매니저가 추가되었습니다.');
+						}
+						else{
+							alert('이미 가입되 회원입니다.');
+						}
+						console.log(data);
+						start_managing_manager();
+					},
+					complete: function(){
+						goto_pages();
+						loading_active();
+					}
+				});
+			}
+
+			function mypage(){
+				var userSeq = $('#userSeq').html();
+				loading_active();
+				$.ajax({
+					type: "GET",
+					url: 'https://greenmate-163904.appspot.com/manager/mypage',
+					headers:{
+						userSeq: userSeq
+					},
+					success: function( data, textStatus, jqXHR ){
+						console.log(data.factory);
+						console.log(data.call);
+
+						if(data.call == undefined){
+							$('#mypage_tel').html('없음');
+						}
+						else{
+							$('#mypage_tel').html(data.call);
+						}
+
+						if(data.username == undefined){
+							$('#mypage_name').html('없음');
+						}
+						else{
+							$('#mypage_name').html(data.username);
+						}
+
+						if(data.email == undefined){
+							$('#mypage_email').html('없음');
+						}
+						else{
+							$('#mypage_email').html(data.email);
+						}
+						if(data.factory == undefined){
+							$('#mypage_place').html('없음');
+						}
+						else{
+							$('#mypage_place').html(data.factory);
+						}
+					},
+					complete: function(){
+						loading_active();
+					}
+				});
+			}
+			function mypage_adjust(){
+				goto_innerpage();
+				$('.page_mypage_adjust').css('display','inherit');
+				var name = $('#mypage_name').html();
+				var call = $('#mypage_tel').html();
+				var email = $('#mypage_email').html();
+				var factory = $('#mypage_place').html();
+				if(name == '없음'){
+					name = '';
+				}
+				if(call == '없음'){
+					call = '';
+				}
+				if(email == '없음'){
+					email = '';
+				}
+				if(factory == '없음'){
+					factory = '';
+				}
+
+				$('#mypage_adjust_name').val(name);
+				$('#mypage_adjust_tel').val(call);
+				$('#mypage_adjust_email').val(email);
+				$('#mypage_adjust_factory').val(factory);
+				Materialize.updateTextFields();
+			}
+			function mypage_adjust_process(){
+				var userSeq = $('#userSeq').html();
+				var name = $('#mypage_adjust_name').val();
+				var call = $('#mypage_adjust_tel').val();
+				var email = $('#mypage_adjust_email').val();
+				var factory = $('#mypage_adjust_factory').val();
+
+				if(name.length < 1 || call.length < 1 || email.length < 1 || factory.length < 1){
+					alert('입력을 확인해주세요');
+				}
+				else{
+					loading_active();
+					$.ajax({
+						type: "POST",
+						url: 'https://greenmate-163904.appspot.com/manager/modifyMyInfo',
+						headers:{
+							userSeq: userSeq
+						},
+						data:{
+							name: name,
+							call: call,
+							email: email,
+							factory: factory
+						},
+						success: function( data, textStatus, jqXHR ){
+							console.log(data);
+						},
+						complete: function(){
+							loading_active();
+							goto_pages();
+							mypage();
+						}
+					});
+				}
+			}
+
+			function register_greenmate(){
+				var register_name = $('#register_name').val();
+				var register_id = $('#register_id').val();
+				var register_password = $('#register_password').val();
+				var register_password_confirm = $('#register_password_confirm').val();
+
+				if(register_name.length <1 || register_id.length <1 || register_password.length <1 || register_password_confirm.length <1){
+					alert('입력을 확인해주세요');
+				}
+				else{
+					if(register_password == register_password_confirm){
+						var del = confirm('이용약관에 동의하십니까?');
+						if(del == true){
+							loading_active();
+							var username = register_name;
+							var id = register_id;
+							var password = register_password;
+							$.ajax({
+								type: "POST",
+								url: 'https://greenmate-163904.appspot.com/signup',
+								data: {
+									username: username,
+									id: id,
+									password: password
+								}
+								}).success(function( data, textStatus, jqXHR ){
+									console.log(data);
+									if(data.isSuccess == 1){
+										loading_active();
+										alert('가입완료!');
+										$('#modal_agreement_close').modal('close');
+									}
+									else if(data.isSuccess == 0){
+										alert(data.statusText);
+										loading_active();
+									}
+							});
+						}
+						else{
+						}
+					}
+					else{
+						alert('비밀번호가 다릅니다.');
+					}
+				}
+				
+		}
+    </script>
+  </head>
+  <body>
+  <div class="loader loader--style3" title="2">
+  	<br><br>
+  	<img width="320px" src="img/logo.png" alt="">
+		<svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			 width="75px" height="75px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+		<path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
+			<animateTransform attributeType="xml"
+				attributeName="transform"
+				type="rotate"
+				from="0 25 25"
+				to="360 25 25"
+				dur="0.6s"
+				repeatCount="indefinite"/>
+			</path>
+		</svg>
+	</div>
+
+  <div class="login_page">
+		<div class="row">
+			<div class="offset-l4 col s4 login_wrapper z-depth-3">
+				<div class="row">
+					<div class="col offset-s3 s6 center-align">
+						<img class="responsive-img" src="img/logo.png" alt="">
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="input-field col s12">
+						<input id="id" type="text" value="">
+						<label for="id">ID</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12">
+						<input id="password" type="password" value="">
+						<label for="password">PASSWORD</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col s12 center-align">
+						<a href="#" class="btn login_">LOGIN</a>
+					</div>
+					<br><br>
+					<div id="userSeq" style="display:hidden; opacity:0"></div>
+				</div>
+			</div>
+
+			<div class="offset-l4 col s4 outter">
+				<a href="#modal_register" id="register_btn" data-target="modal_register" class="white-text">회원가입</a>
+			</div>
+		</div>
+  </div>
+
+		<div class="container_">
+			<ul class="left_nav">
+				<li id="page0" class="center-align"><img height="162px" src="img/logo.png"></li>
+				<li id="page1" class="active"> <i class="material-icons left">question_answer</i>질문게시판</li>
+				<li id="page2" class="">	<i class="material-icons left">class</i>가이드</li>
+				<li id="page3" class="">	<i class="material-icons left">settings_remote</i>식물관리</li>
+				<li id="page4" class="">	<i class="material-icons left">supervisor_account</i>회원관리</li>
+				<li id="page5" class="">	<i class="material-icons left">recent_actors</i>매니저관리</li>
+				<li id="page6" class="">	<i class="material-icons left">assignment_ind</i>마이페이지</li>
+				<li id="logout" onclick="logout()"><i class="material-icons left">lock_outline</i>로그아웃</li>
+			</ul>
+			<div class="pages_wrapper">
+				<div class="pages page0">
+					<img src="img/logo.png" alt="">
+				</div>
+				<div class="pages page1 active">
+					<div class="top_">
+						<div class="left"><h2>질문게시판</h2></div>
+						<div class="right">총 질문수: <span id="num_questions"></span><input type="checkbox" id="seeqa"><label for="seeqa">전문가 답변이 없는 질문만 보기</label></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight ">
+							<thead>
+								<tr>
+									<th>작성자</th>
+									<th>제목</th>
+									<th>작성일</th>
+									<th>답변수</th>
+									<th>전문가 답변수</th>
+								</tr>
+							</thead>
+							<tbody id="qa_">
+
+							</tbody>
+						</table>
+					  <div class="row pagination_wrapper">
+							<div class="col offset-s4 offset-m4 offset-l4 s4 m4 l4 center-align">
+								<ul class="pagination qa_pagination">
+								</ul>
+							</div>
+							<div class="col s4 m4 l4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="회원명, 제목, 내용" id="qa_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn" onclick="start_qa_search()">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page2">
+					<div class="top_">
+						<div class="left"><h2>가이드</h2></div>
+						<div class="right">총 가이드수: <span id="num_guides"></span><a href="#" class="btn" onclick="add_guide()">가이드 추가</a></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>게시자</th>
+									<th>내용</th>
+									<th>게시일</th>
+									<th>표시함</th>
+								</tr>
+							</thead>
+							<tbody id="guide_">
+							</tbody>
+						</table>
+					  <div class="row pagination_wrapper">
+							<div class="col offset-s4 offset-m4 offset-l4 s4 m4 l4 center-align">
+								<ul class="pagination guide_pagination">
+								</ul>
+							</div>
+							<div class="col s4 m4 l4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="회원명, 제목, 내용" id="guide_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn" onclick="start_guide_search()">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page3">
+					<div class="top_">
+						<div class="left"><h2>식물 관리</h2></div>
+						<div class="right">총 식물수: <span id="num_plants"></span><input type="checkbox" id="seeplant"><label for="seeplant">내가 관리하는 식물만 보기</label></div>
+					</div>
+					<div class="mid_">
+						<div id="qr_checker"></div>
+					</div>
+					<div class="main_">
+						<table id="plant_sorting" class="bordered highlight">
+							<thead>
+								<tr>
+									<th></th>
+									<th>식물ID</th>
+									<th>지점</th>
+									<th>관리자</th>
+									<th>구매자</th>
+									<th>식물명</th>
+									<th>등록일</th>
+									<th data-sort="string">갱신일</th>
+								</tr>
+							</thead>
+							<tbody id="plant_">
+							</tbody>
+						</table>
+						<div class="row pagination_wrapper">
+							<div class="col s4">
+								<a href="#!" class="btn" onclick="qr_print()">QR 프린트</a>
+								<a id="add_plant_btn" href="#!" class="btn">식물추가</a>
+							</div>
+
+							<div class="col s4 center-align">
+								<ul class="pagination plant_pagination">
+								</ul>
+							</div>
+
+							<div class="col s4">
+								<div class="row search_wrapper">
+									<div class="input-field col s8">
+										<input placeholder="식물명, 지점, 관리자, 구매자" id="plant_search" type="text">
+									</div>
+									<div class="input-field col s4">
+										<a href="#" class="btn" onclick="start_plants_search()">검 색</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page4">
+					<div class="top_">
+						<div class="left"><h2>회원 관리</h2></div>
+						<div class="right"><input type="checkbox" id="seemember"><label for="seemember">관리중인 식물의 <br>구매자만 보기</label></div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>회원명</th>
+									<th>가입일</th>
+									<th>구매식물수</th>
+								</tr>
+							</thead>
+							<tbody id="memeber_manage">
+
+							</tbody>
+						</table>
+
+						<div class="row pagination_wrapper">
+							<div class="offset-s4 col s4 center-align">
+								<ul class="pagination memeber_manage_pagination">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pages page5">
+					<div class="top_">
+						<div class="left"><h2>매니저 관리</h2></div>
+						<div class="right">
+							<a href="#" class="btn" onclick="add_manager()">매니저 추가</a>
+						</div>
+					</div>
+					<div class="main_">
+						<table class="bordered highlight">
+							<thead>
+								<tr>
+									<th>이름</th>
+									<th>연락처</th>
+									<th>지점</th>
+									<th>관리중인 식물 수</th>
+									<th>총 답변 수</th>
+								</tr>
+							</thead>
+							<tbody id="manage_manager">
+							</tbody>
+						</table>
+
+						<div class="row pagination_wrapper">
+							<div class="offset-s4 col s4 center-align">
+								<ul class="pagination manage_manager_pagination">
+								</ul>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<div class="pages page6">
+					<div class="top_">
+						<div class="left"><h2>마이페이지</h2></div>
+						<div class="right">
+							<a href="#" class="btn" onclick="mypage_adjust()">내 정보 수정</a>
+						</div>
+					</div>
+					<div class="main_">
+						<div class="row">
+							<div class="col s6 mypage_" >
+								<label for="mypage_name">이름: &nbsp;</label>
+								<span id="mypage_name">매니저1</span>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col s6 mypage_">
+								<label for="mypage_tel">전화번호: &nbsp;</label>
+								<span id="mypage_tel">010-1234-4567</span>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col s6 mypage_">
+								<label for="mypage_email">이메일: &nbsp;</label>
+								<span id="mypage_email">mgr1@gmail.com</span>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col s6 mypage_">
+								<label for="mypage_place">지점: &nbsp;</label>
+								<span id="mypage_place">용인 식물공장 연구소 지점</span>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_qa">
+				<div class="top_">
+					<div class="left"><h2>회원 질문</h2></div>
+					<div class="right"><a href="#" class="btn red" onclick="delete_question();">질문 삭제</a></div>
+				</div>
+				<div class="main_">
+					<div class="row memeber_top">
+						<div class="input-field col s5">
+							<input disabled id="memeber_q_title" type="text" value="회원의 질문 제목5">
+							<label for="memeber_q_title">질문 제목</label>
+						</div>
+						<div class="input-field col s5">
+							<input disabled id="memeber_q_date" type="text" value="15.10.11">
+							<label for="memeber_q_date">질문 등록일</label>
+						</div>
+						<div class="input-field col s2">
+							<input disabled id="memeber_q_id" type="text" value="22">
+							<label for="memeber_q_id">등록자</label>
+						</div>
+					</div>
+					<span id="hidden_guide_id" style="display:none;opacity:0;"></span>
+					<div class="row">
+						<div class="col s4 card z-depth-0">
+							<img id="member_q_pic" src="" class="responsive-img" alt="">
+						</div>
+					</div>
+
+       		<div class="row">
+       			<div class="input-field col s12">
+							<textarea disabled id="memeber_q_content" class="materialize-textarea">회원의 질문 내용 blah blah</textarea>
+							<label for="memeber_q_content">질문 내용</label>
+       			</div>
+       			<div class="col s12">
+       				<div id="memeber_qa_comment_start"></div>
+       			</div>
+       			<span id="hidden_id" style="display:none"></span>
+       		</div>
+        	<a id="member_a" href="#!" class="btn">답변 작성</a>
+        	<div id="member_a_area" class="row">
+        		<div class="input-field col s12">
+							<input id="memeber_a" type='text'>
+							<label for="memeber_a">답변작성</label>
+       				<div class="btn" onclick="memeber_qa_add_comment()">
+       					<span>답글달기</span>
+       				</div>
+        		</div>
+        	</div>
+        	<div class="row memeber_d">
+        		<div class="col s12 right-align">
+<!--        			<a href="#" class="btn transparent black-text" onclick="goto_pages(); start_qa_pages();">취소</a>&nbsp;-->
+        			<a href="#" class="btn" onclick="goto_pages(); start_qa_pages();">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_guide">
+				<div class="top_">
+					<div class="left"><h2>가이드 수정</h2></div>
+					<div class="right"><input type="checkbox" id="seeguide"><label for="seeguide">가이드 표시함</label></a></div>
+				</div>
+				<div class="main_">
+					<div class="row guide_top">
+						<div class="input-field col s6">
+							<input disabled id="guide_date" type="text" value="　">
+							<label for="guide_date">가이드 날짜</label>
+						</div>
+						<div class="input-field col s6">
+							<input disabled id="guide_writer" type="text" value="　">
+							<label for="guide_writer">가이드 작성자</label>
+						</div>
+					</div>
+					<div class="row guide_mid">
+						<div id="guide_species_wrapper" class="input-field col s6">
+							<select id="guide_species_">	</select>
+							<label>종</label>
+						</div>
+						<div class="input-field col s6">
+							<input id="guide_category" type="text" value="　">
+							<label for="guide_category">식물종류</label>
+						</div>
+					</div>
+
+					<div class="row guide_top">
+						<div class="input-field col s12">
+							<input id="guide_title" type="text" value="">
+							<label for="guide_title">가이드 제목</label>
+						</div>
+					</div>
+
+       		<div id="add_guide"></div>
+
+        	<div class="row guide_d">
+        	<div class="col s2 left-align">
+        		<a href="#!" class="btn transparent black-text" onclick="add_guide_content()">내용 추가</a>
+        	</div>
+        		<div class="col s10 right-align">
+        			<a href="#" class="btn red" onclick="delete_guide();">가이드삭제</a>&nbsp;
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages();start_guide_pages();">취소</a>&nbsp;
+        			<a href="#" class="btn" onclick="modify_guide();goto_pages();">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_guide_add">
+				<div class="top_">
+					<div class="left"><h2>가이드 추가</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row guide_top">
+						<div class="input-field col s4">
+							<input id="guide_add_title" type="text" value="">
+							<label for="guide_add_title">가이드 제목</label>
+						</div>
+						<div class="input-field col s4">
+							<input id="guide_add_category" type="text" value="">
+							<label for="guide_add_category">식물종류</label>
+						</div>
+						<div class="input-field col s4">
+							<select id="guide_add_species">	</select>
+							<label>종</label>
+						</div>
+					</div>
+
+<!--
+						<form id="form_1" method="POST" enctype="multipart/form-data">
+							<div class="file-field input-field">
+								<div class="btn">
+									<span>파일</span>
+									<input id="guide_add_file" type="file" name="file1[]" accept="image/*" multiple>
+								</div>
+								<div class="file-path-wrapper">
+									<input id="guide_ad_file_url" class="file-path" type="text" placeholder="한개 또는 여러개 파일을 선택해주세요">
+								</div>
+							</div>
+						</form>
+
+						<div class="row">
+							<div class="input-field col s12">
+								<textarea id="guide_add_content_" class="materialize-textarea" placeholder="가이드 내용을 입력하세요"></textarea>
+								<label for="guide_add_content_">가이드 내용</label>
+							</div>
+						</div>
+-->
+
+       		<div id="add_guide2"></div>
+
+        	<div class="row guide_d">
+						<div class="col s2 left-align">
+							<a href="#!" class="btn transparent black-text" onclick="add_guide_content2()">내용 추가</a>
+						</div>
+        		<div class="col s10 right-align">
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages();start_guide_pages();">취소</a>&nbsp;
+        			<a href="#" id="submit_add_guide" class="btn" onclick="upload_guide();">확인</a>
+        		</div>
+        	</div>
+				</div>
+			</div>
+			<div class="inner_page page_plant">
+				<div class="top_">
+					<div class="left"><h2>식물 관리 상세</h2></div>
+					<div class="right"><a href="#!" class="btn red" onclick="delete_plant();">식물삭제</a></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="col s12">
+							<h6>관리자 : <span id="plant_manager"></span></h6>
+							<span id="plant_plant_id" style="display:none"></span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col s4"><label for="plant_name">식물명: &nbsp;</label><span id="plant_name"></span></div>
+						<div class="col s4"><label for="plant_username">구매자: &nbsp;</label><span id="plant_username"></span></div>
+						<div class="col s4"><label for="plant_place">지점: &nbsp;</label><span id="plant_place"></span></div>
+					</div>
+					<div class="row">
+						<div class="col s4"><label for="plant_harvest_stat">수확상태: &nbsp;</label><span id="plant_harvest_stat"></span></div>
+						<div class="col s4"><label for="plant_date">최초 등록일: &nbsp;</label><span id="plant_date"></span></div>
+						<div class="col s4"><label for="plant_update">일지 갱신일: &nbsp;</label><span id="plant_update"></span></div>
+					</div>
+					<div class="row">
+						<div class="col s12">
+							<div class="plant_content">
+								<table>
+									<thead>
+										<tr>
+											<th>온도</th>
+											<th>습도</th>
+											<th>광량</th>
+											<th>CO2 농도</th>
+											<th>PH</th>
+											<th>EC</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><span>25</span> °C</td>
+											<td><span>50</span> %</td>
+											<td><span>2.14</span> μmol</td>
+											<td><span>00</span></td>
+											<td><span>00</span></td>
+											<td><span>10uS/cm</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div id="plant_diaries" class="row"></div>
+
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages();start_plant();">뒤로</a>
+					</div>
+				</div>
+
+			</div>
+			<div class="inner_page page_plant_add">
+				<div class="top_">
+					<div class="left"><h2>식물 추가</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="col offset-s2 s8">
+							<div class="row">
+								<div class="input-field col s12">
+									<i class="material-icons prefix black-text">textsms</i>
+									<input type="text" id="userId_autucomplete" class="autocomplete">
+									<label for="userId_autucomplete">회원검색</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col s6">
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="식물이름을 입력해주세요" id="plantName" type="text">
+									<label for="plantName">식물 이름</label>
+								</div>
+							</div>
+						</div>
+						<div class="col s6">
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="식물ID를 입력해주세요" id="plantPosition" type="text">
+									<label for="plantPosition">식물 ID <span class='red-text'> (영문입력)</span></label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col s6">
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="식물종 입력해주세요" id="plantSpecies" type="text">
+									<label for="plantSpecies">식물 종</label>
+								</div>
+							</div>
+						</div>
+						<div class="col s6">
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="게이트웨이를 입력해주세요" value="f4b85e0294e9" id="plantGateway" type="text">
+									<label for="plantGateway">게이트웨이</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col s12">
+							<div class="row">
+								<div class="range-field col s12">
+									<select id="harvestDue">
+										<option value="" disabled selected>재배기간</option>
+										<option value="10">10일</option>
+										<option value="20">20일</option>
+										<option value="30">30일</option>
+										<option value="40">40일</option>
+										<option value="50">50일</option>
+										<option value="60">60일</option>
+										<option value="70">70일</option>
+										<option value="80">80일</option>
+										<option value="90">90일</option>
+										<option value="100">100일</option>
+									</select>
+									<label>재배기간</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+        	<div class="row guide_d">
+        		<div class="col s12 right-align">
+        			<a href="#" class="btn transparent black-text" onclick="goto_pages();start_plant();">취소</a>&nbsp;
+							<a href="#" class="btn" onclick="add_plant()" >확인</a>
+        		</div>
+        	</div>
+
+				</div>
+			</div>
+			<div class="inner_page page_qr">
+				<div class="top_">
+					<div class="left"><h2>QR 코드 인쇄</h2></div>
+					<div class="right"><a href="#" class="btn" onclick="window.print()">QR코드 인쇄</a></div>
+				</div>
+				<div class="main_">
+					<ul id="print_area">
+					</ul>
+
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">뒤로</a>&nbsp;　&nbsp;
+					</div>
+				</div>
+			</div>
+<!-- 매니저 정보 수정
+			<div class="inner_page page_manager">
+				<div class="top_">
+					<div class="left"><h2>매니저 정보 수정</h2></div>
+				</div>
+				<div class="main_">
+					<table>
+						<thead>
+							<tr>
+								<th>매니저 이름</th>
+								<th>전화번호</th>
+								<th>이메일</th>
+								<th>지점</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>매니저4</td>
+								<td>010-1234-4567</td>
+								<td>mgr1@gmail.com</td>
+								<td>
+									<select>
+										<option value="1" selected>용이 식물공장 연구소 지점</option>
+										<option value="2">Option 1</option>
+										<option value="3">Option 2</option>
+										<option value="4">Option 3</option>
+									</select>
+    							<label>지점</label>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+
+					<p><input type="checkbox" id="manager_manage"><label for="manager_manage">매니저 관리 권한</label></p>
+					<p><input type="checkbox" id="manager_place"><label for="manager_place">지점 매니저</label></p>
+					<p><input type="checkbox" id="manager_qa_auth"><label for="manager_qa_auth">전문가 답변 권한</label></p>
+					<div class="manager_bottom right">
+						<a href="#modal_temp_pw" class="btn red modal-trigger">임시 패스워드 발급</a> &nbsp;
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()" >취소</a> &nbsp;
+						<a href="#" class="btn" onclick="goto_pages()">확인</a>
+					</div>
+				</div>
+			</div>
+-->
+			<div class="inner_page page_manager_add">
+				<div class="top_">
+					<div class="left"><h2>매니저 추가</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="input-field col s4">
+							<input placeholder="매니저 명 입력" id="manager_name" type="text">
+							<label for="manager_name">매니저 명</label>
+						</div>
+						<div class="input-field col s4">
+							<input placeholder="전화번호 입력" id="manager_tel" type="tel">
+							<label for="manager_tel">전화번호</label>
+						</div>
+						<div class="input-field col s4">
+							<input placeholder="지점 입력" id="manager_factory" type="text">
+							<label for="manager_factory">지점</label>
+						</div>
+						<div class="input-field col s4">
+							<input placeholder="아이디 입력" id="manager_id" type="text">
+							<label for="manager_id">아이디</label>
+						</div>
+						<div class="input-field col s4">
+							<input placeholder="비밀번호" id="manager_pw" type="password">
+							<label for="manager_pw">비밀번호</label>
+						</div>
+						<div class="input-field col s4">
+							<input placeholder="비밀번호 확인" id="manager_pw_confirm" type="password">
+							<label for="manager_pw_confirm">비밀번호 확인</label>
+						</div>
+					</div>
+					<div class="manager_add_bottom right">
+						<a href="#" class="btn waves-effect waves-light transparent black-text" onclick="goto_pages()">취소</a> &nbsp;
+						<a href="#" class="btn waves-effect waves-light" onclick="confirm_manager_add();">확인</a>
+					</div>
+				</div>
+			</div>
+			<div class="inner_page page_mypage_adjust">
+				<div class="top_">
+					<div class="left"><h2>내 정보 수정</h2></div>
+				</div>
+				<div class="main_">
+					<div class="row">
+						<div class="input-field col s6">
+							<input id="mypage_adjust_name" type="text">
+							<label for="mypage_adjust_name">이름</label>
+						</div>
+						<div class="input-field col s6">
+							<input id="mypage_adjust_tel" type="tel">
+							<label for="mypage_adjust_tel">전화번호</label>
+						</div>
+						<div class="input-field col s6">
+							<input id="mypage_adjust_email" type="email">
+							<label for="mypage_adjust_email">이메일</label>
+						</div>
+						<div class="input-field col s6">
+							<input id="mypage_adjust_factory" type="text">
+							<label for="mypage_adjust_factory">지점</label>
+						</div>
+					</div>
+
+					<div class="row right">
+						<a href="#" class="btn transparent black-text" onclick="goto_pages()">취소</a> &nbsp;
+						<a href="#" class="btn" onclick="mypage_adjust_process();">확인</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="guide_wrapper" style="display:none">
+			<form action="#">
+				<div class="file-field input-field">
+					<div class="btn">
+						<span>파일</span>
+						<input type="file" multiple>
+					</div>
+					<div class="file-path-wrapper">
+						<input class="file-path" type="text" placeholder="파일을 선택해주세요">
+					</div>
+				</div>
+			</form>
+
+			<div class="row">
+				<div class="input-field col s12">
+					<textarea id="guide_content_" class="materialize-textarea" placeholder="가이드 내용을 입력해주세요"></textarea>
+					<label for="guide_content_">가이드 내용</label>
+				</div>
+			</div>
+		</div>
+
+		<div id="modal_temp_pw" class="modal row center-align">
+			<div class="input-field col s12">
+				<input type="text" placeholder="임시 비밀번호를 입력해 주세요">
+			</div>
+			<div class="col s12">
+				<a href="#" class="btn transparent black-text" onclick="$('#modal_temp_pw').modal('close');">취소</a> &nbsp;
+				<a href="#" class="btn" onclick="$('#modal_temp_pw').modal('close');">확인</a>
+			</div>
+		</div>
+
+		<div id="modal_register" class="modal">
+			<div class="row left_modal">
+				<div class="col offset-s2 s8">
+					사용중인 이메일로 가입하고 편리하게 사용해보세요.
+				</div>
+				<div class="col offset-s2 s8">
+					<div class="input-field col s12">
+						<input id="register_name" type="text" class="validate">
+						<label for="register_name">이름</label>
+					</div>
+					<div class="input-field col s12">
+						<input id="register_id" type="email" class="validate">
+						<label for="register_id">이메일</label>
+					</div>
+					<div class="input-field col s12">
+						<input id="register_password" type="password" class="validate">
+						<label for="register_password">비밀번호</label>
+					</div>
+
+					<div class="input-field col s12">
+						<input id="register_password_confirm" type="password" class="validate">
+						<label for="register_password_confirm">비밀번호 재입력</label>
+					</div>
+				</div>
+
+				<div class="col offset-s2 s8 center-align agreement_btn_wrapper">
+					<a href="#" class="agreement_btn" onclick="$('#modal_register .right_modal').addClass('active');">그린메이트 이용약관</a>
+				</div>
+
+				<div class="col offset-s2 s8 center-align">
+					<p>※회원가입을 함으로써 그린메이트의 이용약관, 개인정보 취급방침 및 운영원칙을 동의 하시게 됩니다.</p>
+					<a href="#" id="modal_agreement_close"  class="btn transparent green-text">뒤로</a>
+					<a href="#" class="btn" onclick="register_greenmate();">계정 만들기</a>
+					<br><br>
+				</div>
+			</div>
+			<div class="row right_modal">
+				<div class="left-align backBtn_wrapper">
+					<a href="#" class="backBtn green-text" onclick="$('#modal_register .right_modal').removeClass('active');"><i class="material-icons">trending_flat</i></a>
+				</div>
+				<div class="col offset-s2 s8" id="agreement_text"></div><br>
+			</div>
+
+		</div>
+  </body>
+</html>
